@@ -44,7 +44,7 @@
    $reset = *reset;
    
    
-   // my commit is here
+   // my frst commit is here from my local computer
    // ...
    
    
