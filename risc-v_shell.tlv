@@ -47,7 +47,7 @@
    $reset = *reset;
    
    
-   sdfdf
+   
    
    
    // Assert these to end simulation (before Makerchip cycle limit).
