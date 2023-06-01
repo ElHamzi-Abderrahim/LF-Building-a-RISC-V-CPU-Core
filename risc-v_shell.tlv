@@ -73,35 +73,53 @@
    /// decoder ///
    // extracting fields from the instructoin
    $opcode[6:0] = $instr[6:0] ;
-   $rd[4:0] = $instr[11:7] ;
-   $fct3[2:0] = $instr[14:12] ;
-   $rs1[4:0] = $instr[19:15] ;
-   $rs2[4:0] = $instr[24:20] ;
+   $rd[4:0]     = $instr[11:7] ;
+   $funct3[2:0] = $instr[14:12] ;
+   $rs1[4:0]    = $instr[19:15] ;
+   $rs2[4:0]    = $instr[24:20] ;
+   $funct7[2:0] = $instr[31:25] ;
    
    // determing when the fields are valid
    $rd_valid = $is_r_instr || $is_i_instr || $is_u_instr || $is_j_instr ;
    
-   $fct3_valid = $is_r_instr || $is_i_instr || $is_s_instr || $is_b_instr ;
+   $funct3_valid = $is_r_instr || $is_i_instr || $is_s_instr || $is_b_instr ;
    
    $rs1_valid = $is_r_instr || $is_i_instr || $is_s_instr || $is_b_instr ;
    
    $rs2_valid = $is_r_instr || $is_s_instr || $is_b_instr ;
    
+   $funct7_valid = $is_r_instr ;
+   
    $imm_valid = $is_u_instr || $is_s_instr || $is_b_instr || $is_i_instr || $is_j_instr ;
    
    `BOGUS_USE( $is_u_instr $is_r_instr $is_i_instr $is_s_instr 
-               $is_b_instr $is_j_instr $opcode $rd $fct3 $rs1 $rs2
-               $rd_valid $fct3_valid $rs1_valid $rs2_valid $imm_valid 4) 
+               $is_b_instr $is_j_instr $opcode $rd $funct3 $funct7
+               $rs1 $rs2 $rd_valid $funct3_valid $funct7_valid 
+               $rs1_valid $rs2_valid $imm_valid $imm) 
                // in order to skip the unsigned signals in the LOG
    
-   $imm[31:0] = $is_i_instr ? {21{$instr[31]}, $instr[30:25], $instr[24:21],$instr[20]}:
-                $is_s_instr ? {21{$instr[31]}, $instr[30:25], $instr[11:8],$instr[7]}:
-                $is_b_instr ? {20{$instr[31]}, $instr[7], $instr[30:25], $instr[11:8],1'b0}:
+   $imm[31:0] = $is_i_instr ? {{21{$instr[31]}}, $instr[30:25], $instr[24:21],$instr[20]}:
+                $is_s_instr ? {{21{$instr[31]}}, $instr[30:25], $instr[11:8],$instr[7]}:
+                $is_b_instr ? {{20{$instr[31]}}, $instr[7], $instr[30:25], $instr[11:8],1'b0}:
                 $is_u_instr ? {$instr[31], $instr[30:20], $instr[19:12],12'b0}:
-                $is_j_instr ? {12{$instr[31]}, $instr[19:12], $instr[20], $instr[30:25], $instr[24:21],1'b0}:
+                $is_j_instr ? {{12{$instr[31]}}, $instr[19:12], $instr[20], $instr[30:25], $instr[24:21],1'b0}:
                 32'b0; //default value
    ///
    
+   // decode logic instruction
+   $dec_bits[10:0] = {$instr[30], $fnct3, $opcode} ;
+      // some instructions
+   $is_beq = $dec_bits ==? 11'bx_000_1100011 ;
+   $is_bne = $dec_bits ==? 11'bx_001_1100011 ;
+   $is_blt = $dec_bits ==? 11'bx_100_1100011 ;
+   $is_bge = $dec_bits ==? 11'bx_101_1100011 ;
+   $is_bltu = $dec_bits ==? 11'bx_110_1100011 ;
+   $is_bgeu = $dec_bits ==? 11'bx_111_1100011 ;
+   $is_addi = $dec_bits ==? 11'bx_000_0010011 ;
+   $is_add = $dec_bits == 11'b0_000_0110011 ;
+   // ... etc.
+   
+   ///
    
    
    // Assert these to end simulation (before Makerchip cycle limit).
