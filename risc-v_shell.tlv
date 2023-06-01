@@ -98,7 +98,7 @@
                 $is_s_instr ? {21{$inst[31]}, $inst[30:25], $inst[11:8],$inst[7]}:
                 $is_b_instr ? {20{$inst[31]}, $inst[7], $inst[30:25], $inst[11:8],1'b0}:
                 $is_u_instr ? {$inst[31], $inst[30:20], $inst[19:12],12'b0}:
-                $is_j_instr ? {21{$inst[31]}, $inst[30:25], $inst[11:8],$inst[7]};
+                $is_j_instr ? {21{$inst[31]}, $inst[19:12], $inst[20], $inst[30:25], $inst[24:21],1'b0};
    ///
    
    
