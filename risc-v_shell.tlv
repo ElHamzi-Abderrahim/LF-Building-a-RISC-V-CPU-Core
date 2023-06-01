@@ -50,6 +50,23 @@
    // Instanciating Instruction Memory
    `READONLY_MEM($pc, $$instr[31:0]);
    
+   // Determine instruction type : R-type, I-type, S-type, B-type, U-type, J-type.
+   $is_u_instr = $intr[6:2] ==? 5'b0x101 ;
+   
+   $is_r_instr = $intr[6:2] ==? 5'b011x0 || 
+                 $intr[6:2] ==  5'b10100 ||
+                 $intr[6:2] ==  5'b01011 ;
+                 
+   $is_i_instr = $intr[6:2] ==? 5'b0000x 
+                 $intr[6:2] ==? 5'b001x0;
+                 
+   $is_s_instr = $intr[6:2] ==? 5'b0100x ;
+   
+   $is_b_instr = $intr[6:2] == 5'b11000 ;
+   
+   $is_i_instr = $intr[6:2] == 5'b11001 ;
+   
+   
    
    // Assert these to end simulation (before Makerchip cycle limit).
    *passed = 1'b0;
