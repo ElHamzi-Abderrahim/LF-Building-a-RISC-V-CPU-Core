@@ -91,7 +91,14 @@
    
    `BOGUS_USE( $is_u_instr $is_r_instr $is_i_instr $is_s_instr 
                $is_b_instr $is_j_instr $opcode $rd $fct3 $rs1 $rs2
-               $rd_valid $fct3_valid $rs1_valid $rs2_valid $imm_valid)
+               $rd_valid $fct3_valid $rs1_valid $rs2_valid $imm_valid) 
+               // in order to skip the unsigned signals in the LOG
+   
+   $imm[31:0] = $is_i_instr ? {21{$inst[31]}, $inst[30:25], $inst[24:21],$inst[20]}:
+                $is_s_instr ? {21{$inst[31]}, $inst[30:25], $inst[11:8],$inst[7]}:
+                $is_b_instr ? {20{$inst[31]}, $inst[7], $inst[30:25], $inst[11:8],$inst[7]}:
+                $is_u_instr ? {21{$inst[31]}, $inst[30:25], $inst[11:8],$inst[7]}:
+                $is_j_instr ? {21{$inst[31]}, $inst[30:25], $inst[11:8],$inst[7]}:
    ///
    
    
