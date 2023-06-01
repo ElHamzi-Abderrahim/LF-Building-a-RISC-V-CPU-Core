@@ -43,10 +43,11 @@
    
    $reset = *reset;
    
-   
+   // Program Conter
    $pc[31:0] = >>1$next_pc[31:0] ;
    $next_pc[31:0] = $reset ? 32'b0 : ($pc[31:0] + 4) ;
    
+   //
    
    
    
