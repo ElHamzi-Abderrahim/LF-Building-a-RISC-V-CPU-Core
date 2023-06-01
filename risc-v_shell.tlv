@@ -52,7 +52,7 @@
    `READONLY_MEM($pc, $$instr[31:0]);
    ///
    
-   // Determine instruction type : R-type, I-type, S-type, B-type, U-type, J-type.
+   // Determine instruction instr : R-instr, I-instr, S-instr, B-instr, U-instr, J-instr.
    $is_u_instr = $instr[6:2] ==? 5'b0x101 ;
    
    $is_r_instr = $instr[6:2] ==? 5'b011x0 ||
@@ -63,31 +63,35 @@
                  $instr[6:2] ==? 5'b0000x ||
                  $instr[6:2] == 5'b11001;
    
-   $is_s_instr = $instr[6:2] ==? 5'b0100x ;
+   $is_s_instr = $instr[6:2] ==? 5'b0100x ; 
    
    $is_b_instr = $instr[6:2] == 5'b11000 ;
    
    $is_j_instr = $instr[6:2] == 5'b11001 ;
    ///
    
+   /// decoder ///
    // extracting fields from the instructoin
    $opcode[6:0] = $instr[6:0] ;
    $rd[4:0] = $instr[11:7] ;
    $fct3[2:0] = $instr[14:12] ;
    $rs1[4:0] = $instr[19:15] ;
    $rs2[4:0] = $instr[24:20] ;
+   
    // determing when the fields are valid
-   $rd_valid = $is_r_type || $is_i_type || $is_u_type || $is_j_type ;
+   $rd_valid = $is_r_instr || $is_i_instr || $is_u_instr || $is_j_instr ;
    
-   $fct3_valid = $is_r_type || $is_i_type || $is_s_type || $is_b_type ;
+   $fct3_valid = $is_r_instr || $is_i_instr || $is_s_instr || $is_b_instr ;
    
-   $rs1_valid = $is_r_type || $is_i_type || $is_s_type || $is_b_type ;
+   $rs1_valid = $is_r_instr || $is_i_instr || $is_s_instr || $is_b_instr ;
    
-   $rs2_valid = $is_r_type || $is_s_type || $is_b_type ;
+   $rs2_valid = $is_r_instr || $is_s_instr || $is_b_instr ;
    
-   $imm_valid = $is_u_type || $is_s_type || $is_b_type || $is_i_type || $is_j_type ;
+   $imm_valid = $is_u_instr || $is_s_instr || $is_b_instr || $is_i_instr || $is_j_instr ;
    
-   
+   `BOGUS_USE( $is_u_instr $is_r_instr $is_i_instr $is_s_instr 
+               $is_b_instr $is_j_instr $opcode $rd $fct3 $rs1 $rs2
+               $rd_valid $fct3_valid $rs1_valid $rs2_valid $imm_valid)
    ///
    
    
