@@ -48,7 +48,7 @@
    $next_pc[31:0] = $reset ? 32'b0 : ($pc[31:0] + 4) ;
    ///
    
-   // Instanciating Instruction Memory
+   // instranciating instruction Memory
    `READONLY_MEM($pc, $$instr[31:0]);
    ///
    
@@ -91,14 +91,15 @@
    
    `BOGUS_USE( $is_u_instr $is_r_instr $is_i_instr $is_s_instr 
                $is_b_instr $is_j_instr $opcode $rd $fct3 $rs1 $rs2
-               $rd_valid $fct3_valid $rs1_valid $rs2_valid $imm_valid) 
+               $rd_valid $fct3_valid $rs1_valid $rs2_valid $imm_valid 4) 
                // in order to skip the unsigned signals in the LOG
    
-   $imm[31:0] = $is_i_instr ? {21{$inst[31]}, $inst[30:25], $inst[24:21],$inst[20]}:
-                $is_s_instr ? {21{$inst[31]}, $inst[30:25], $inst[11:8],$inst[7]}:
-                $is_b_instr ? {20{$inst[31]}, $inst[7], $inst[30:25], $inst[11:8],1'b0}:
-                $is_u_instr ? {$inst[31], $inst[30:20], $inst[19:12],12'b0}:
-                $is_j_instr ? {21{$inst[31]}, $inst[19:12], $inst[20], $inst[30:25], $inst[24:21],1'b0};
+   $imm[31:0] = $is_i_instr ? {21{$instr[31]}, $instr[30:25], $instr[24:21],$instr[20]}:
+                $is_s_instr ? {21{$instr[31]}, $instr[30:25], $instr[11:8],$instr[7]}:
+                $is_b_instr ? {20{$instr[31]}, $instr[7], $instr[30:25], $instr[11:8],1'b0}:
+                $is_u_instr ? {$instr[31], $instr[30:20], $instr[19:12],12'b0}:
+                $is_j_instr ? {12{$instr[31]}, $instr[19:12], $instr[20], $instr[30:25], $instr[24:21],1'b0}:
+                32'b0; //default value
    ///
    
    
