@@ -77,7 +77,7 @@
    $funct3[2:0] = $instr[14:12] ;
    $rs1[4:0]    = $instr[19:15] ;
    $rs2[4:0]    = $instr[24:20] ;
-   $funct7[2:0] = $instr[31:25] ;
+   $funct7[6:0] = $instr[31:25] ;
    
    // determing when the fields are valid
    $rd_valid = $is_r_instr || $is_i_instr || $is_u_instr || $is_j_instr ;
@@ -95,7 +95,9 @@
    `BOGUS_USE( $is_u_instr $is_r_instr $is_i_instr $is_s_instr 
                $is_b_instr $is_j_instr $opcode $rd $funct3 $funct7
                $rs1 $rs2 $rd_valid $funct3_valid $funct7_valid 
-               $rs1_valid $rs2_valid $imm_valid $imm) 
+               $rs1_valid $rs2_valid $imm_valid $imm
+               $dec_bits $is_beq $is_bne $is_blt $is_bge 
+               $is_bltu $is_bgeu $is_addi $is_add ) 
                // in order to skip the unsigned signals in the LOG
    
    $imm[31:0] = $is_i_instr ? {{21{$instr[31]}}, $instr[30:25], $instr[24:21],$instr[20]}:
@@ -107,7 +109,7 @@
    ///
    
    // decode logic instruction
-   $dec_bits[10:0] = {$instr[30], $fnct3, $opcode} ;
+   $dec_bits[10:0] = {$instr[30], $funct3, $opcode} ;
       // some instructions
    $is_beq = $dec_bits ==? 11'bx_000_1100011 ;
    $is_bne = $dec_bits ==? 11'bx_001_1100011 ;
