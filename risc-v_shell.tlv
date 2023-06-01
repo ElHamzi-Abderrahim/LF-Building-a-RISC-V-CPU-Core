@@ -70,6 +70,8 @@
    $is_j_instr = $intr[6:2] == 5'b11001 ;
    ///
    
+   // extracting fields from the instructoin
+   $rs2[4:0] = $intr
    
    
    // Assert these to end simulation (before Makerchip cycle limit).
