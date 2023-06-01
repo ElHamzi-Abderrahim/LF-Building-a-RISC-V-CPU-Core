@@ -53,25 +53,43 @@
    ///
    
    // Determine instruction type : R-type, I-type, S-type, B-type, U-type, J-type.
-   $is_u_instr = $intr[6:2] ==? 5'b0x101 ;
+   $is_u_instr = $instr[6:2] ==? 5'b0x101 ;
    
-   $is_r_instr = $intr[6:2] ==? 5'b011x0 ||
-                 $intr[6:2] ==  5'b10100 ||
-                 $intr[6:2] ==  5'b01011 ;
+   $is_r_instr = $instr[6:2] ==? 5'b011x0 ||
+                 $instr[6:2] ==  5'b10100 ||
+                 $instr[6:2] ==  5'b01011 ;
    
-   $is_i_instr = $intr[6:2] ==? 5'b0000x ||
-                 $intr[6:2] ==? 5'b0000x ||
-                 $intr[6:2] == 5'b11001;
+   $is_i_instr = $instr[6:2] ==? 5'b0000x ||
+                 $instr[6:2] ==? 5'b0000x ||
+                 $instr[6:2] == 5'b11001;
    
-   $is_s_instr = $intr[6:2] ==? 5'b0100x ;
+   $is_s_instr = $instr[6:2] ==? 5'b0100x ;
    
-   $is_b_instr = $intr[6:2] == 5'b11000 ;
+   $is_b_instr = $instr[6:2] == 5'b11000 ;
    
-   $is_j_instr = $intr[6:2] == 5'b11001 ;
+   $is_j_instr = $instr[6:2] == 5'b11001 ;
    ///
    
    // extracting fields from the instructoin
-   $rs2[4:0] = $intr
+   $opcode[6:0] = $instr[6:0] ;
+   $rd[4:0] = $instr[11:7] ;
+   $fct3[2:0] = $instr[14:12] ;
+   $rs1[4:0] = $instr[19:15] ;
+   $rs2[4:0] = $instr[24:20] ;
+   // determing when the fields are valid
+   $rd_valid = $is_r_type || $is_i_type || $is_u_type || $is_j_type ;
+   
+   $fct3_valid = $is_r_type || $is_i_type || $is_s_type || $is_b_type ;
+   
+   $rs1_valid = $is_r_type || $is_i_type || $is_s_type || $is_b_type ;
+   
+   $rs2_valid = $is_r_type || $is_s_type || $is_b_type ;
+   
+   $imm_valid = $is_u_type || $is_s_type || $is_b_type || $is_i_type || $is_j_type ;
+   
+   
+   ///
+   
    
    
    // Assert these to end simulation (before Makerchip cycle limit).
