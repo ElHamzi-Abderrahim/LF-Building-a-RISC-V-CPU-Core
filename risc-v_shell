@@ -129,6 +129,7 @@
                   $is_add ? $src1_value + $src2_value :
                   32'b0 ; // ADD and ADDI instructions
    $wr_data[31:0] = $rd_valid ? $result : 32'b0 ;
+   $wr_en = ($rd == 4'b0 ? 0 : 1 ;
    // 
    
    // Assert these to end simulation (before Makerchip cycle limit).
