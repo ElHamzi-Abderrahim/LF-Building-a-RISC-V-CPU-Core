@@ -27,6 +27,8 @@
    m4_asm(ADD, x14, x13, x14)           // Incremental summation
    m4_asm(ADDI, x13, x13, 1)            // Increment loop count by 1
    m4_asm(BLT, x13, x12, 1111111111000) // If a3 is less than a2, branch to label named <loop>
+   //m4_asm(ADDI, x0, x0, 0110) // testing that the x0 if it can be change to a diff. data rather than 0
+   //     ==> we should prevent x0 from changing
    // Test result value in x14, and set x31 to reflect pass/fail.
    m4_asm(ADDI, x30, x14, 111111010100) // Subtract expected value of 44 to set x30 to 1 if and only iff the result is 45 (1 + 2 + ... + 9).
    m4_asm(BGE, x0, x0, 0) // Done. Jump to itself (infinite loop). (Up to 20-bit signed immediate plus implicit 0 bit (unlike JALR) provides byte address; last immediate bit should also be 0)
@@ -45,7 +47,9 @@
    
    // Program Conter
    $pc[31:0] = >>1$next_pc[31:0] ;
-   $next_pc[31:0] = $reset ? 32'b0 : ($pc[31:0] + 4) ;
+   $next_pc[31:0] =  $reset ? 32'b0 : $br_tgt_pc[31:0] ;
+                     //$taken_br ? $br_tgt_pc[31:0] :
+                     //$pc[31:0] + 4 ;
    ///
    
    // instranciating instruction Memory
@@ -60,14 +64,14 @@
                  $instr[6:2] ==  5'b01011 ;
    
    $is_i_instr = $instr[6:2] ==? 5'b0000x ||
-                 $instr[6:2] ==? 5'b0000x ||
+                 $instr[6:2] ==? 5'b001x0 ||
                  $instr[6:2] == 5'b11001;
    
    $is_s_instr = $instr[6:2] ==? 5'b0100x ; 
    
    $is_b_instr = $instr[6:2] == 5'b11000 ;
    
-   $is_j_instr = $instr[6:2] == 5'b11001 ;
+   $is_j_instr = $instr[6:2] == 5'b11011 ;
    ///
    
    /// decoder ///
@@ -121,18 +125,35 @@
    $is_add = $dec_bits == 11'b0_000_0110011 ;
    // ... etc.
    ///
+   
    // Arithmetical Logical Unit
    $result[31:0] = 
                   $is_addi ? $src1_value + $imm :
                   $is_add ? $src1_value + $src2_value :
                   32'b0 ; // ADD and ADDI instructions
-   // 
+   $wr_data[31:0] = $rd_valid ? $result : 32'b0 ;
+   $wr_en = ($rd == 5'b0) ? 0 : 1 ; // disable the write to the x0' RF element
+   ///
    
+   //Branch instructions 
+   $taken_br = 
+               $is_beq  ? $src1_value == $src2_value :
+               $is_bne  ? $src1_value != $src2_value :
+               $is_blt  ? ($src1_value < $src2_value)^($src1_value[31] != $src2_value[31]) :
+               $is_bge  ? ($src1_value >= $src2_value)^($src1_value[31] != $src2_value[31]) :
+               $is_bltu ? $src1_value < $src2_value :
+               $is_bgeu ? $src1_value >= $src2_value :
+               1'b0 ;
+               
+   
+   $br_tgt_pc[31:0] = $taken_br ? ($imm + $pc) : ($pc + 4) ; // 
+   
+   ///
    // Assert these to end simulation (before Makerchip cycle limit).
    *passed = 1'b0;
    *failed = *cyc_cnt > M4_MAX_CYC;
    
-   m4+rf(32, 32, $reset, $wr_en, $wr_index[4:0], $wr_data[31:0], $rd1_en, $rs1, $$src1_value, $rd2_en, $rs2, $$src2_value)
+   m4+rf(32, 32, $reset, $wr_en, $rd, $wr_data, $rd1_en, $rs1, $$src1_value, $rd2_en, $rs2, $$src2_value)
    //m4+dmem(32, 32, $reset, $addr[4:0], $wr_en, $wr_data[31:0], $rd_en, $rd_data)
    m4+cpu_viz()
 \SV
